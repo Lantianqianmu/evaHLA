@@ -5,8 +5,8 @@
 // params.hlahd = "/home/xrz/hlahd.1.7.1/hlahd.sh"
 // params.refdir = "/home/xrz/hlahd.1.7.1"
 params.input_csv = '/data/xrz/HLA/nextflow/samplesheet.csv'
-params.refdir = params.refdir ?: ( params.hlahd ? file(params.hlahd).getParent().getParent().toString() : null )
 params.run_hlahd = true
+params.hlahd_refdir = params.refdir ?: ( params.hlahd ? file(params.hlahd).getParent().getParent().toString() : null )
 params.hlahd_linenum = 400000
 params.run_t1k = true
 params.t1k_preset = "hla-wgs"
@@ -80,8 +80,8 @@ process HLAHD {
         -f ${params.refdir}/freq_data/ \
         ${meta.id}_R1.fq \
         ${meta.id}_R2.fq \
-        ${params.refdir}/HLA_gene.split.txt \
-        ${params.refdir}/dictionary/ \
+        ${params.hlahd_refdir}/HLA_gene.split.txt \
+        ${params.hlahd_refdir}/dictionary/ \
         ${meta.id}_HLA_HD ./
     cp ${meta.id}_HLA_HD/result/${meta.id}_HLA_HD_final.result.txt ./
     """
