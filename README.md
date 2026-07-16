@@ -14,7 +14,7 @@ python | 3.11.0
 fastp | 1.3.6
 bowtie2 | 2.5.5
 t1k | 1.0.9
-
+HLA-HD | 1.7.1
 
 ## Installation ##
 Installation should finish within 10 minutes (Epyc 7542).  
