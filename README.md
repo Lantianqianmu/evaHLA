@@ -42,7 +42,7 @@ HLA-HD and t1k are used to perform HLA genotyping on evaHLA libraries. We use a 
 `fastq_1`: Path to read 1.  
 `fastq_2`: Path to read 2.  
 
-(2) If the genotype of HBV is unknown, run the nftide-caphic pipeline. Change directory to nftide-caphic with `cd nftide-caphic`, and execute:
+(2) Change directory to evaHLA with `cd evaHLA`, and execute:
 ```
 nextflow run main.nf \
   -output-dir your_output_dir \
