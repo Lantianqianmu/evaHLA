@@ -162,8 +162,16 @@ workflow {
       workingDir             :  ${workflow.outputDir}
     """.stripIndent()
 
+    if( run_hlahd && !params.hlahd ) {
+        exit 1, "params.hlahd is not set. Please specify --hlahd explicitly."
+    }
+
     if( run_hlahd && !params.hlahd_refdir ) {
-        exit 1, "params.hlahd_refdir is not set and could not be inferred from params.hlahd. Please specify --refdir explicitly."
+        exit 1, "params.hlahd_refdir is not set and could not be inferred from params.hlahd. Please specify --hlahd_refdir explicitly."
+    }
+
+    if( run_t1k && !params.t1k_reffile ) {
+        exit 1, "params.t1k_reffile is not set. Please specify --t1k_reffile explicitly."
     }
 
     ch_read_pairs = channel.fromPath(params.input_csv)
