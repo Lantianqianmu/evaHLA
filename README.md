@@ -34,7 +34,7 @@ cd evaHLA
 (4) Prepare HLA index files for t1k. Refer to their github pages.
 
 ## Overview ##
-HLA-HD and t1k are used to perform HLA genotyping on evaHLA libraries. We use HLA-HD to genotype HLA-A, -B, -C, -DPA1, -DPB1, -DQA1, -DQB1, -DRB1, and use t1k to genotype HLA-DRB3/4/5.
+HLA-HD and t1k are used to perform HLA genotyping on evaHLA libraries. We use a hybrid comparison method to decide the final HLA-A, -B, -C, -DPA1, -DPB1, -DQA1, -DQB1, -DRB1 and HLA-DRB3/4/5.
 
 ## Usage ##
 (1) Prepare the `samplesheet.csv`. The csv file __must__ contain 3 columns with defined column names:  
@@ -60,7 +60,7 @@ nextflow run main.nf \
 `--hostGenome`: the `--assembly` parameter for `pairtools parse`.  
 `--run_hlahd`: Perform genotyping with HLA-HD. Default: true. Valid options: true, false.   
 `--hlahd`: Path to hlahd.sh. If the PATH is already exported, path to hlahd.sh will be automatically detected using `which hlahd.sh`. Otherwise, specify the path to hlahd.sh explicitly.  
-`--hlahd_linenum`: Number of lines to extract from fastq files as input to HLA-HD. Since HLA-HD is time-consuming with large targeted HLA dataset, we subset fastq to perform genotyping. Default: 400000 lines. Typical runtime: 6 hours.  
+`--hlahd_linenum`: Number of lines to extract from fastq files as input to HLA-HD. Since HLA-HD is time-consuming with large targeted HLA dataset, we subset fastq to perform genotyping. Default: 400000 lines. Typical runtime: 6 hours. Set to 0 to disable subsetting.  
 `--hlahd_refdir`: Directory that stores __HLA_gene.split.txt__ and __dictionary/__. Default: directory two levels up from the path of __--hlahd__.   
 `--run_t1k`: Perform genotyping with t1k. Default: true. Valid options: true, false.  
 `--t1k_preset`: Preset of t1k.  
@@ -71,6 +71,7 @@ Go to `-output-dir`. The pipeline will create folders named according to the `sa
 `fastqs`: Merged and adapter-trimmed fastqs.  
 `HLA_HD`: Genotyping results of HLA-HD.  
 `t1k`: Genotyping results of t1k.  
+if both HLA-HD and t1k are called, a merged putative result will be established under `-output-dir`.  
 
 
 
