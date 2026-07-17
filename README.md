@@ -47,12 +47,12 @@ HLA-HD and t1k are used to perform HLA genotyping on EvaHLA libraries. We use a 
 nextflow run main.nf \
   -output-dir your_output_dir \
   --input_csv samplesheet.csv \
-  --run_hlahd true
+  --run_hlahd true \
   --hlahd_linenum 400000 \
   --hlahd_refdir path_to_hlahd_basedir \
   --run_t1k true \
   --t1k_preset hla-wgs \
-  --t1k_reffile hlaidx_dna_seq.fa
+  --t1k_reffile hlaidx_dna_seq.fa \
   -bg -resume
 ```
 `-output-dir`: Path to the output directory.  
