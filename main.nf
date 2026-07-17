@@ -3,14 +3,15 @@
 // nextflow run main.nf --hlahd_linenum 1000 -resume
 
 // params.hlahd = "/home/xrz/hlahd.1.7.1/hlahd.sh"
-// params.refdir = "/home/xrz/hlahd.1.7.1"
+// params.hlahd_refdir = "/home/xrz/hlahd.1.7.1"
 params.input_csv = '/data/xrz/HLA/nextflow/samplesheet.csv'
+params.hlahd_refdir = params.hlahd_refdir ?: ( params.hlahd ? file(params.hlahd).getParent().getParent().toString() : null )
 params.run_hlahd = true
-params.hlahd_refdir = params.refdir ?: ( params.hlahd ? file(params.hlahd).getParent().getParent().toString() : null )
 params.hlahd_linenum = 400000
 params.run_t1k = true
 params.t1k_preset = "hla-wgs"
 params.t1k_reffile = "/home/xrz/hlaidx/hlaidx_dna_seq.fa"
+
 
 
 process MERGE_FQ {
@@ -70,14 +71,20 @@ process HLAHD {
     script:
 
     """
-    zcat ${r1} | head -n ${params.hlahd_linenum} > ${meta.id}_R1.fq
-    zcat ${r2} | head -n ${params.hlahd_linenum} > ${meta.id}_R2.fq
+    if [ ${params.hlahd_linenum} -eq 0 ]; then
+        zcat ${r1} > ${meta.id}_R1.fq
+        zcat ${r2} > ${meta.id}_R2.fq
+    else
+        zcat ${r1} | head -n ${params.hlahd_linenum} > ${meta.id}_R1.fq
+        zcat ${r2} | head -n ${params.hlahd_linenum} > ${meta.id}_R2.fq
+    fi
+
 
     hlahd.sh \
         -t ${task.cpus} \
         -m 100 \
         -c 0.95 \
-        -f ${params.refdir}/freq_data/ \
+        -f ${params.hlahd_refdir}/freq_data/ \
         ${meta.id}_R1.fq \
         ${meta.id}_R2.fq \
         ${params.hlahd_refdir}/HLA_gene.split.txt \
@@ -97,8 +104,10 @@ process T1K {
 
     output:
     tuple val(meta), path("*.tsv"), emit: t1k_result
+    tuple val(meta), path("${meta.id}_t1k_allele.tsv"), emit: t1k_allele
 
     script:
+
 
     """
     run-t1k \
@@ -114,6 +123,32 @@ process T1K {
 }
 
 
+process PARSE_RESULT {
+
+    tag "Parse results from ${t1k_allele} and ${hlahd}"
+
+    input:
+    tuple val(meta), path(hlahd), path(t1k_allele)
+    path(pyparse)
+
+    output:
+    tuple val(meta), path("${meta.id}_parsed.tsv"), emit: parsed_result
+
+    script:
+
+    """
+    python ${pyparse} \
+        --sample ${meta.id} \
+        --hlahd ${hlahd} \
+        --t1k ${t1k_allele} \
+        --out ${meta.id}_parsed.tsv
+    """
+
+
+}
+
+// python /data/xrz/HLA/nextflow/parse.py --sample AC12 --hlahd ./HLA_HD/AC12_HLA_HD_final.result.txt --t1k ./t1k/AC12_t1k_allele.tsv --out ./AC12_parsed.tsv
+
 
 workflow {
 
@@ -122,13 +157,13 @@ workflow {
       nftide-caphic
       ===================================
       HLA-HD                 :  ${params.hlahd}
-      HLA-HD refDir          :  ${params.refdir}
+      HLA-HD refDir          :  ${params.hlahd_refdir}
       projectDir             :  ${projectDir}
       workingDir             :  ${workflow.outputDir}
     """.stripIndent()
 
-    if( !params.refdir ) {
-        exit 1, "params.refdir is not set and could not be inferred from params.hlahd. Please specify --refdir explicitly."
+    if( !params.hlahd_refdir ) {
+        exit 1, "params.hlahd_refdir is not set and could not be inferred from params.hlahd. Please specify --refdir explicitly."
     }
 
     ch_read_pairs = channel.fromPath(params.input_csv)
@@ -170,13 +205,23 @@ workflow {
     FASTP(MERGE_FQ.out.merged_fq)
     ch_hlahd_out = channel.empty()
     ch_t1k_out = channel.empty()
+    ch_t1k_toparse = channel.empty()
+    ch_parsed_result = channel.empty()
     if(params.run_hlahd){
         ch_hlahd_out = HLAHD(FASTP.out.fastp_fq).hlahd_result
     }
     if(params.run_t1k){
-        ch_t1k_out = T1K(FASTP.out.fastp_fq).t1k_result
+        T1K(FASTP.out.fastp_fq)
+        ch_t1k_out = T1K.out.t1k_result
+        ch_t1k_toparse = T1K.out.t1k_allele
+        
     }
-
+    
+    if(params.run_t1k && params.run_hlahd){
+        PARSE_RESULT(ch_hlahd_out.join(ch_t1k_toparse, by: 0), "${projectDir}/parse.py")
+        ch_parsed_result = PARSE_RESULT.out.parsed_result
+    }
+    
 
     publish:
     out_merged_fastqs = MERGE_FQ.out.merged_fq
@@ -184,6 +229,7 @@ workflow {
     out_fastp_html = FASTP.out.fastp_html
     out_hlahd = ch_hlahd_out
     out_t1k = ch_t1k_out
+    out_parse = ch_parsed_result
 
 
 }
@@ -203,6 +249,9 @@ output {
     }
     out_t1k {
         path { meta, _f1 -> "${meta.id}/t1k" }
+    }
+    out_parse {
+        path { meta, _f1 -> "${meta.id}" }
     }
 
 }
