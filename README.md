@@ -61,7 +61,7 @@ nextflow run main.nf \
 `--run_hlahd`: Perform genotyping with HLA-HD. Default: true. Valid options: true, false.   
 `--hlahd`: Path to hlahd.sh. If the PATH is already exported, path to hlahd.sh will be automatically detected using `which hlahd.sh`. Otherwise, specify the path to hlahd.sh explicitly.  
 `--hlahd_linenum`: Number of lines to extract from fastq files as input to HLA-HD. Since HLA-HD is time-consuming with large targeted HLA dataset, we subset fastq to perform genotyping. Default: 400000 lines. Typical runtime: 6 hours. Set to 0 to disable subsetting.  
-`--hlahd_refdir`: Directory that stores __HLA_gene.split.txt__ and __dictionary/__. Default: directory two levels up from the path of __--hlahd__.   
+`--hlahd_refdir`: Directory that stores __HLA_gene.split.txt__, __freq_data/__ and __dictionary/__. Default: directory two levels up from the path of __--hlahd__.   
 `--run_t1k`: Perform genotyping with t1k. Default: true. Valid options: true, false.  
 `--t1k_preset`: Preset of t1k.  
 `--t1k_reffile`: Index file of t1k.  
