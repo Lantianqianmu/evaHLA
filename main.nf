@@ -162,7 +162,7 @@ workflow {
       workingDir             :  ${workflow.outputDir}
     """.stripIndent()
 
-    if( !params.hlahd_refdir ) {
+    if( run_hlahd && !params.hlahd_refdir ) {
         exit 1, "params.hlahd_refdir is not set and could not be inferred from params.hlahd. Please specify --refdir explicitly."
     }
 
