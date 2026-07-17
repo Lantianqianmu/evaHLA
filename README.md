@@ -1,5 +1,5 @@
-# evaHLA
-Nextflow pipeline for evaHLA
+# EvaHLA
+Nextflow pipeline for EvaHLA
 
 ## System requirements ##
 The pipeline requires >= 256 GB memory. It is recommended to have at least 8 cores. We typically run the pipeline on a server with dual Epyc 7542 and 512 GB memory.
@@ -20,21 +20,21 @@ HLA-HD | 1.7.1
 Installation should finish within 10 minutes (Epyc 7542).  
 (1) Setup the environment using conda or mamba:  
 ```
-mamba create -n evaHLA -c bioconda -c conda-forge python=3.11.0 openjdk=17.0.8 nextflow=25.10.2 fastp=1.3.6 bowtie2=2.5.5 t1k=1.0.9
+mamba create -n EvaHLA -c bioconda -c conda-forge python=3.11.0 openjdk=17.0.8 nextflow=25.10.2 fastp=1.3.6 bowtie2=2.5.5 t1k=1.0.9
 ```    
 Then activate the conda environment:  
 ```
-mamba activate evaHLA
+mamba activate EvaHLA
 ```
 (2) Clone the repository with `git clone`, and execute
 ```
-cd evaHLA
+cd EvaHLA
 ```
 (3) Install HLA-HD. Refer to their manuals to install and prepare HLA index files.
 (4) Prepare HLA index files for t1k. Refer to their github pages.
 
 ## Overview ##
-HLA-HD and t1k are used to perform HLA genotyping on evaHLA libraries. We use a hybrid comparison method to decide the final HLA-A, -B, -C, -DPA1, -DPB1, -DQA1, -DQB1, -DRB1 and HLA-DRB3/4/5.
+HLA-HD and t1k are used to perform HLA genotyping on EvaHLA libraries. We use a hybrid comparison method to decide the final HLA-A, -B, -C, -DPA1, -DPB1, -DQA1, -DQB1, -DRB1 and HLA-DRB3/4/5.
 
 ## Usage ##
 (1) Prepare the `samplesheet.csv`. The csv file __must__ contain 3 columns with defined column names:  
@@ -42,7 +42,7 @@ HLA-HD and t1k are used to perform HLA genotyping on evaHLA libraries. We use a 
 `fastq_1`: Path to read 1.  
 `fastq_2`: Path to read 2.  
 
-(2) Change directory to evaHLA with `cd evaHLA`, and execute:
+(2) Change directory to EvaHLA with `cd EvaHLA`, and execute:
 ```
 nextflow run main.nf \
   -output-dir your_output_dir \
